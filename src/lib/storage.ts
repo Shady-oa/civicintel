@@ -1,4 +1,5 @@
 import { User, Admin, Report, ChatMessage, Notification, CurrentSession } from './types';
+import { generateSeedData } from './seed-data';
 
 const KEYS = {
   users: 'civic360_users',
@@ -7,6 +8,7 @@ const KEYS = {
   chats: 'civic360_chats',
   notifications: 'civic360_notifications',
   currentUser: 'civic360_currentUser',
+  seeded: 'civic360_seeded',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -22,13 +24,23 @@ function set(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-// Initialize default admin
+// Initialize default admin + seed data
 export function initializeDefaults() {
   const admins = getAdmins();
   if (admins.length === 0) {
     set(KEYS.admins, [
       { id: 'admin-1', username: 'Admin', email: 'admin@gmail.com', password: '123123' },
     ]);
+  }
+
+  // Seed sample data on first load
+  if (!localStorage.getItem(KEYS.seeded)) {
+    const seed = generateSeedData();
+    set(KEYS.users, seed.users);
+    set(KEYS.reports, seed.reports);
+    set(KEYS.chats, seed.chats);
+    set(KEYS.notifications, seed.notifications);
+    localStorage.setItem(KEYS.seeded, 'true');
   }
 }
 
