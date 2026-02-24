@@ -1,6 +1,7 @@
 import { getReports } from '@/lib/storage';
 import { FileText, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import StatCard from '@/components/StatCard';
 
 export default function AdminDashboard() {
   const reports = getReports();
@@ -34,23 +35,26 @@ export default function AdminDashboard() {
     rate: d.total > 0 ? Math.round((d.resolved / d.total) * 100) : 0,
   }));
 
+  // Status breakdown for additional chart
+  const statusData = [
+    { name: 'Pending', value: reports.filter(r => r.status === 'Pending').length },
+    { name: 'In Progress', value: reports.filter(r => r.status === 'In Progress').length },
+    { name: 'Resolved', value: resolved },
+  ].filter(d => d.value > 0);
+
   const COLORS = ['hsl(152,61%,31%)', 'hsl(0,66%,47%)', '#F59E0B', '#6366F1', '#EC4899', '#14B8A6', '#8B5CF6', '#F97316'];
+  const STATUS_COLORS = ['#F59E0B', '#6366F1', 'hsl(152,61%,31%)'];
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Overview of all civic reports and performance metrics.</p>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(s => (
-          <div key={s.label} className="civic-card flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.color}`}>
-              <s.icon className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{s.value}</p>
-              <p className="text-sm text-muted-foreground">{s.label}</p>
-            </div>
-          </div>
+          <StatCard key={s.label} {...s} />
         ))}
       </div>
 
@@ -59,9 +63,9 @@ export default function AdminDashboard() {
         <div className="civic-card-flat">
           <h3 className="font-semibold mb-4">Reports by Category</h3>
           {categoryData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={280}>
               <PieChart>
-                <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} innerRadius={50} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                   {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip />
@@ -76,9 +80,9 @@ export default function AdminDashboard() {
         <div className="civic-card-flat">
           <h3 className="font-semibold mb-4">Department Resolution Rate</h3>
           {deptData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={280}>
               <BarChart data={deptData}>
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={60} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(value: number) => `${value}%`} />
                 <Bar dataKey="rate" radius={[8, 8, 0, 0]}>
@@ -93,6 +97,37 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* Status breakdown */}
+      {statusData.length > 0 && (
+        <div className="civic-card-flat">
+          <h3 className="font-semibold mb-4">Report Status Overview</h3>
+          <div className="flex items-center gap-6">
+            <div className="w-48 h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} innerRadius={40}>
+                    {statusData.map((_, i) => <Cell key={i} fill={STATUS_COLORS[i]} />)}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex-1 space-y-3">
+              {statusData.map((d, i) => (
+                <div key={d.name} className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: STATUS_COLORS[i] }} />
+                  <span className="text-sm flex-1">{d.name}</span>
+                  <span className="font-semibold">{d.value}</span>
+                  <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(d.value / total) * 100}%`, backgroundColor: STATUS_COLORS[i] }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

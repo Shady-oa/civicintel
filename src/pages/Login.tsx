@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import civicHero from '@/assets/civic-hero.png';
 
 const Login = () => {
   const { login, signup } = useAuth();
@@ -32,20 +33,51 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md fade-in">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4">
-            <svg className="w-8 h-8 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
+    <div className="min-h-screen flex bg-background">
+      {/* Left panel - branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: 'radial-gradient(circle at 20% 80%, hsl(var(--primary-foreground)) 1px, transparent 1px), radial-gradient(circle at 80% 20%, hsl(var(--primary-foreground)) 1px, transparent 1px)',
+          backgroundSize: '60px 60px'
+        }} />
+        <div className="relative text-center text-primary-foreground z-10">
+          <img src={civicHero} alt="Civic360" className="w-48 h-48 mx-auto mb-8 drop-shadow-2xl" />
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Civic360</h1>
+          <p className="text-lg opacity-90 max-w-sm mx-auto leading-relaxed">
+            Empowering citizens and governments with intelligent civic reporting and real-time governance analytics.
+          </p>
+          <div className="flex gap-6 mt-10 justify-center">
+            <div className="text-center">
+              <p className="text-3xl font-bold">24/7</p>
+              <p className="text-sm opacity-75">Monitoring</p>
+            </div>
+            <div className="w-px bg-primary-foreground/20" />
+            <div className="text-center">
+              <p className="text-3xl font-bold">AI</p>
+              <p className="text-sm opacity-75">Powered</p>
+            </div>
+            <div className="w-px bg-primary-foreground/20" />
+            <div className="text-center">
+              <p className="text-3xl font-bold">100%</p>
+              <p className="text-sm opacity-75">Transparent</p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Civic360</h1>
-          <p className="text-muted-foreground mt-1">Integrated Civic Intelligence Platform</p>
         </div>
+      </div>
 
-        <div className="civic-card-flat bg-background border border-border shadow-lg">
-          <h2 className="text-xl font-semibold mb-6">{isSignup ? 'Create Account' : 'Sign In'}</h2>
+      {/* Right panel - form */}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md fade-in">
+          <div className="text-center mb-8 lg:hidden">
+            <img src={civicHero} alt="Civic360" className="w-20 h-20 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold tracking-tight">Civic360</h1>
+            <p className="text-muted-foreground mt-1">Integrated Civic Intelligence Platform</p>
+          </div>
+
+          <div className="lg:block hidden mb-8">
+            <h2 className="text-2xl font-bold">{isSignup ? 'Create your account' : 'Welcome back'}</h2>
+            <p className="text-muted-foreground mt-1">{isSignup ? 'Join Civic360 to start reporting issues.' : 'Sign in to access your dashboard.'}</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -81,13 +113,13 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
+              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity text-base"
             >
-              {isSignup ? 'Sign Up' : 'Sign In'}
+              {isSignup ? 'Create Account' : 'Sign In'}
             </button>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-5 text-center">
             <button
               onClick={() => setIsSignup(!isSignup)}
               className="text-sm text-primary hover:underline"
@@ -95,6 +127,13 @@ const Login = () => {
               {isSignup ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>
           </div>
+
+          {!isSignup && (
+            <div className="mt-6 p-4 bg-muted rounded-xl text-xs text-muted-foreground">
+              <p className="font-medium text-foreground mb-1">Demo Admin Credentials:</p>
+              <p>Username: Admin · Email: admin@gmail.com · Password: 123123</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
