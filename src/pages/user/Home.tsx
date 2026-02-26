@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { getReports, getNotifications } from '@/lib/storage';
-import { FileText, Clock, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
+import { getReports, getNotifications, getAnnouncements } from '@/lib/storage';
+import { FileText, Clock, CheckCircle, AlertTriangle, ArrowRight, Megaphone } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import { Link } from 'react-router-dom';
 
@@ -8,16 +8,17 @@ export default function UserHome() {
   const { session } = useAuth();
   const reports = getReports().filter(r => r.userId === session?.id);
   const notifications = getNotifications(session?.id).filter(n => !n.read).slice(0, 5);
+  const announcements = getAnnouncements().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 3);
 
   const total = reports.length;
   const pending = reports.filter(r => r.status === 'Pending').length;
-  const resolved = reports.filter(r => r.status === 'Resolved').length;
+  const solved = reports.filter(r => r.status === 'Solved').length;
   const highRisk = reports.some(r => r.riskLevel === 'High');
 
   const stats = [
     { label: 'Total Reports', value: total, icon: FileText, color: 'bg-primary/10 text-primary' },
     { label: 'Pending', value: pending, icon: Clock, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Resolved', value: resolved, icon: CheckCircle, color: 'bg-success-light text-success' },
+    { label: 'Solved', value: solved, icon: CheckCircle, color: 'bg-success-light text-success' },
   ];
 
   return (
@@ -35,18 +36,39 @@ export default function UserHome() {
         </Link>
       </div>
 
-      {/* Risk Badge */}
       <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${highRisk ? 'risk-high' : 'risk-low'}`}>
         <AlertTriangle className="w-4 h-4" />
         {highRisk ? 'High Risk Detected' : 'All Clear – Low Risk'}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map(s => (
           <StatCard key={s.label} {...s} />
         ))}
       </div>
+
+      {/* Announcements */}
+      {announcements.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Megaphone className="w-5 h-5 text-primary" /> Public Announcements
+          </h3>
+          <div className="space-y-2">
+            {announcements.map(a => (
+              <div key={a.id} className={`civic-card-flat py-4 ${a.urgent ? 'border-l-4 border-l-destructive' : ''}`}>
+                <div className="flex items-start gap-3">
+                  {a.urgent && <span className="text-xs px-2 py-0.5 rounded-full risk-high shrink-0">URGENT</span>}
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">{a.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{a.message}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{a.targetCounty} · {new Date(a.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Alerts */}
       <div>

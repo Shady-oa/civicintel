@@ -47,3 +47,41 @@ export function generateAutoResponse(): string {
   ];
   return responses[Math.floor(Math.random() * responses.length)];
 }
+
+// Predictive simulation
+export function predictCompletionDelay(progress: number, daysElapsed: number, totalDays: number): { delayProbability: number; confidence: number } {
+  const expectedProgress = Math.min(100, (daysElapsed / totalDays) * 100);
+  const gap = expectedProgress - progress;
+  const delayProbability = Math.min(95, Math.max(5, gap * 2 + Math.random() * 15));
+  const confidence = Math.floor(Math.random() * 15) + 80;
+  return { delayProbability: Math.round(delayProbability), confidence };
+}
+
+export function predictBudgetOverrun(totalBudget: number, fundsSpent: number, progress: number): { overrunProbability: number; confidence: number } {
+  const spentRatio = fundsSpent / totalBudget;
+  const progressRatio = progress / 100;
+  const projectedTotal = progressRatio > 0 ? fundsSpent / progressRatio : fundsSpent * 2;
+  const overrunRatio = (projectedTotal - totalBudget) / totalBudget;
+  const overrunProbability = Math.min(95, Math.max(5, overrunRatio * 100 + Math.random() * 10));
+  const confidence = Math.floor(Math.random() * 15) + 78;
+  return { overrunProbability: Math.round(overrunProbability), confidence };
+}
+
+export function predictConflictEscalation(severity: string, reportCount: number): { escalationProbability: number; confidence: number } {
+  const base = severity === 'High' ? 60 : severity === 'Medium' ? 35 : 15;
+  const escalationProbability = Math.min(95, base + reportCount * 5 + Math.random() * 10);
+  const confidence = Math.floor(Math.random() * 15) + 75;
+  return { escalationProbability: Math.round(escalationProbability), confidence };
+}
+
+export function calculateTransparencyIndex(reports: { status: string }[], projects: { totalBudget: number; fundsSpent: number }[], avgRating: number): number {
+  const totalReports = reports.length || 1;
+  const solvedRate = (reports.filter(r => r.status === 'Solved').length / totalReports) * 100;
+  const budgetCompliance = projects.length > 0
+    ? (projects.filter(p => p.fundsSpent <= p.totalBudget).length / projects.length) * 100
+    : 100;
+  const ratingScore = (avgRating / 5) * 100;
+  const responseRate = (reports.filter(r => r.status !== 'Pending').length / totalReports) * 100;
+
+  return Math.round((solvedRate * 0.3 + budgetCompliance * 0.3 + ratingScore * 0.2 + responseRate * 0.2));
+}

@@ -14,7 +14,7 @@ export default function MyReports() {
   const reports = getReports().filter(r => r.userId === session?.id);
 
   const statusIcon = (status: string) => {
-    if (status === 'Resolved') return <CheckCircle className="w-4 h-4 text-success" />;
+    if (status === 'Solved') return <CheckCircle className="w-4 h-4 text-success" />;
     if (status === 'In Progress') return <Clock className="w-4 h-4 text-amber-500" />;
     return <Clock className="w-4 h-4 text-muted-foreground" />;
   };
@@ -33,7 +33,6 @@ export default function MyReports() {
     setChatInput('');
     setRefreshKey(k => k + 1);
 
-    // Auto-response after 2s
     setTimeout(() => {
       addChat({
         id: `msg-${Date.now()}`,
@@ -86,7 +85,6 @@ export default function MyReports() {
         </div>
       )}
 
-      {/* Detail Modal */}
       {selectedReport && (
         <div className="fixed inset-0 bg-foreground/40 z-50 flex items-center justify-center p-4" onClick={() => setSelectedReport(null)}>
           <div className="bg-background rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
@@ -114,7 +112,6 @@ export default function MyReports() {
                 <img src={selectedReport.image} alt="Report" className="rounded-xl max-h-48 object-cover w-full" />
               )}
 
-              {/* AI Analysis */}
               <div className="bg-muted rounded-xl p-4 space-y-2">
                 <h4 className="font-semibold text-sm flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-primary" /> AI Analysis
@@ -127,7 +124,6 @@ export default function MyReports() {
                 </div>
               </div>
 
-              {/* Chat */}
               <div>
                 <h4 className="font-semibold text-sm mb-3">Chat</h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto mb-3" key={refreshKey}>

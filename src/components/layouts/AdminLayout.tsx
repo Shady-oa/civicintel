@@ -1,16 +1,20 @@
 import { NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, FileText, AlertTriangle, BarChart3, MessageCircle, Bell, Users, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, AlertTriangle, BarChart3, MessageCircle, Bell, Users, LogOut, Menu, X, Building2, Shield, ScrollText, Megaphone } from 'lucide-react';
 import { getNotifications } from '@/lib/storage';
 import { useState } from 'react';
 
 const navItems = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/reports', icon: FileText, label: 'All Reports' },
+  { to: '/admin/projects', icon: Building2, label: 'Projects & Budget' },
   { to: '/admin/risk', icon: AlertTriangle, label: 'Risk Monitoring' },
+  { to: '/admin/conflicts', icon: Shield, label: 'Conflict Approvals' },
   { to: '/admin/performance', icon: BarChart3, label: 'Performance' },
   { to: '/admin/chat', icon: MessageCircle, label: 'Chat Center' },
+  { to: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
   { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
+  { to: '/admin/audit', icon: ScrollText, label: 'Audit Logs' },
   { to: '/admin/management', icon: Users, label: 'Admin Management' },
 ];
 
@@ -34,13 +38,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-lg">C</span>
           </div>
-          <span className="font-bold text-lg">Civic360 Admin</span>
+          <span className="font-bold text-lg">CivicIntel Admin</span>
           <button className="ml-auto lg:hidden" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
           {navItems.map(item => {
             const isActive = location.pathname === item.to || (item.to !== '/admin' && location.pathname.startsWith(item.to));
             return (
