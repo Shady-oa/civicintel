@@ -1,22 +1,32 @@
 import { useState } from 'react';
-import { getReports, updateReport, addNotification } from '@/lib/storage';
+import { getReports, updateReport, addNotification, addAuditLog } from '@/lib/storage';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 
 export default function AllReports() {
+  const { session } = useAuth();
   const [refreshKey, setRefreshKey] = useState(0);
   const reports = getReports().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const changeStatus = (id: string, userId: string, status: string, title: string) => {
-    updateReport(id, { status: status as 'Pending' | 'In Progress' | 'Resolved' });
+    updateReport(id, { status: status as 'Pending' | 'In Progress' | 'Solved' });
     addNotification({
       id: `notif-${Date.now()}`,
       userId,
       title: 'Status Updated',
       message: `Your report "${title}" status changed to ${status}.`,
-      type: status === 'Resolved' ? 'success' : 'info',
+      type: status === 'Solved' ? 'success' : 'info',
       read: false,
       createdAt: new Date().toISOString(),
+    });
+    addAuditLog({
+      id: `audit-${Date.now()}`,
+      adminId: session!.id,
+      adminName: session!.username,
+      action: 'Report Status Changed',
+      details: `Changed "${title}" to ${status}`,
+      timestamp: new Date().toISOString(),
     });
     toast.success('Status updated');
     setRefreshKey(k => k + 1);
@@ -32,6 +42,14 @@ export default function AllReports() {
       type: 'warning',
       read: false,
       createdAt: new Date().toISOString(),
+    });
+    addAuditLog({
+      id: `audit-${Date.now()}`,
+      adminId: session!.id,
+      adminName: session!.username,
+      action: 'Report Escalated',
+      details: `Escalated "${title}" to high priority`,
+      timestamp: new Date().toISOString(),
     });
     toast.success('Report escalated');
     setRefreshKey(k => k + 1);
@@ -76,7 +94,7 @@ export default function AllReports() {
                       >
                         <option>Pending</option>
                         <option>In Progress</option>
-                        <option>Resolved</option>
+                        <option>Solved</option>
                       </select>
                       <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-muted-foreground" />
                     </div>

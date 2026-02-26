@@ -10,7 +10,7 @@ export default function Performance() {
     if (!deptMap[r.suggestedDepartment]) deptMap[r.suggestedDepartment] = { total: 0, resolved: 0, avgRisk: 0 };
     deptMap[r.suggestedDepartment].total++;
     deptMap[r.suggestedDepartment].avgRisk += r.riskScore;
-    if (r.status === 'Resolved') deptMap[r.suggestedDepartment].resolved++;
+    if (r.status === 'Solved') deptMap[r.suggestedDepartment].resolved++;
   });
 
   const data = Object.entries(deptMap).map(([name, d]) => ({
